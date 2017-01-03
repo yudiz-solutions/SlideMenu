@@ -1,6 +1,11 @@
 # SlideMenu
 
-SlideMenu using UITabBarController &amp; Storyboard &amp; Constraint base structure . Easy to use &amp; implement and with 2 animations, and tap/swipe gesture recognizer.
+SlideMenu using UITabBarController and Storyboard and Constraint base structure.
+- Easy To Use
+- Easy To Implement
+- 2 Animation Style
+- Tap gesture recognizer
+- Pan gesture recognizer
 
 
 ## SlideMenu Animation Style 1
