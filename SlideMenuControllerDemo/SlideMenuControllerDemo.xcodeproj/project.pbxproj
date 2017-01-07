@@ -28,7 +28,7 @@
 		0326BF1D1E1A14DC00C4E6F9 /* MoreVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0326BF1C1E1A14DC00C4E6F9 /* MoreVC.swift */; };
 		0326BF1F1E1A14F500C4E6F9 /* NotificationsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0326BF1E1E1A14F500C4E6F9 /* NotificationsVC.swift */; };
 		0326BF241E1A156F00C4E6F9 /* Menu.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0326BF221E1A156F00C4E6F9 /* Menu.storyboard */; };
-		0326BF261E1A165800C4E6F9 /* MenuCells.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0326BF251E1A165800C4E6F9 /* MenuCells.swift */; };
+		03F871471E20D0D600D9F20A /* MenuCells.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03F871461E20D0D600D9F20A /* MenuCells.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -55,7 +55,7 @@
 		0326BF1C1E1A14DC00C4E6F9 /* MoreVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MoreVC.swift; sourceTree = "<group>"; };
 		0326BF1E1E1A14F500C4E6F9 /* NotificationsVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotificationsVC.swift; sourceTree = "<group>"; };
 		0326BF231E1A156F00C4E6F9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Menu.storyboard; sourceTree = "<group>"; };
-		0326BF251E1A165800C4E6F9 /* MenuCells.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MenuCells.swift; path = ../../../../Live_Projectes/OHSpirits/Sourcecode/OHSpirits/OHSpirits/Views/Cells/MenuCells.swift; sourceTree = "<group>"; };
+		03F871461E20D0D600D9F20A /* MenuCells.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MenuCells.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -127,8 +127,8 @@
 				0326BED91E1A11E400C4E6F9 /* ParentVC.swift */,
 				0326BED81E1A11E400C4E6F9 /* CustomNavigationController.swift */,
 				0326BEDB1E1A11E400C4E6F9 /* SlideMenuTabbarVC.swift */,
+				03F871461E20D0D600D9F20A /* MenuCells.swift */,
 				0326BEDA1E1A11E400C4E6F9 /* SlideMenuContainerVC.swift */,
-				0326BF251E1A165800C4E6F9 /* MenuCells.swift */,
 			);
 			path = Parent;
 			sourceTree = "<group>";
@@ -242,7 +242,7 @@
 				0326BEDD1E1A11E400C4E6F9 /* ParentVC.swift in Sources */,
 				0326BF171E1A14A900C4E6F9 /* HomeVC.swift in Sources */,
 				0326BF1D1E1A14DC00C4E6F9 /* MoreVC.swift in Sources */,
-				0326BF261E1A165800C4E6F9 /* MenuCells.swift in Sources */,
+				03F871471E20D0D600D9F20A /* MenuCells.swift in Sources */,
 				0326BF121E1A122B00C4E6F9 /* Subclasses.swift in Sources */,
 				0326BF051E1A122B00C4E6F9 /* UIFontExtension.swift in Sources */,
 				0326BF041E1A122B00C4E6F9 /* UIColorExtension.swift in Sources */,
@@ -423,6 +423,7 @@
 				0326BED41E1A119400C4E6F9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
