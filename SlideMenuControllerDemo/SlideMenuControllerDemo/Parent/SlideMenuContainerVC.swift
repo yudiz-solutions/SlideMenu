@@ -47,11 +47,13 @@ public enum SlideAnimationStyle {
 }
 
 public struct SlideMenuOptions {
-    public static var animationStyle: SlideAnimationStyle = .style2
+    public static var animationStyle: SlideAnimationStyle = .style1
     
     public static var screenFrame     = UIScreen.main.bounds
-    
-    public static var pending = UIDevice.current.userInterfaceIdiom == .pad ? _screenSize.width/2.5 : 60
+    public static var panVelocity : CGFloat = 800
+    public static var panAnimationDuration : TimeInterval = 0.35
+
+    public static var pending = UIDevice.current.userInterfaceIdiom == .pad ? _screenSize.width/2.5 : 75 * _widthRatio
     public static var thresholdTrailSpace : CGFloat =  UIScreen.main.bounds.width + pending
     public static var thresholdLedSpace : CGFloat =  UIScreen.main.bounds.width - pending
     public static var panGesturesEnabled: Bool = true
@@ -86,7 +88,6 @@ class SlideMenuContainerVC: ParentVC {
     // MARK: Variables
     var transparentView = UIControl()
     var tabbar : UITabBarController!
-    
     var menu = MenuSpecific()
     var menuActionType: SlideAction = .close
     
@@ -240,55 +241,10 @@ extension SlideMenuContainerVC {
         if let container = self.findContainerController(){
             if menuActionType == .close
             {
-                menuActionType = .open
-                if SlideMenuOptions.animationStyle == .style1{
-                    menuContainer.isHidden = false
-                    container.menuContainerTrailSpace.constant =  SlideMenuOptions.pending
-                    container.menuContainerLedSpace.constant =  0
-                }else{
-                    container.mainContainerTrailSpace.constant = -SlideMenuOptions.thresholdLedSpace
-                    container.mainContainerLedSpace.constant = SlideMenuOptions.thresholdLedSpace
-                    menuSlideAnimation(x: SlideMenuOptions.screenFrame.width)
-                }
-                self.transparentView.alpha = 0
-                self.transparentView.isHidden = false
-                
-                UIView.animate(withDuration: 0.35, animations: { () -> Void in
-                    
-                    container.tableView.isUserInteractionEnabled = false
-                    self.transparentView.isEnabled = false
-                    self.transparentView.alpha = 1
-                    container.view.layoutIfNeeded()
-               
-                }, completion: { (finished) -> Void in
-                    self.transparentView.isEnabled = true
-                    container.tableView.isUserInteractionEnabled = true
-                })
+                container.panMenuOpen()
             }else
             {
-                menuActionType = .close
-                
-                if SlideMenuOptions.animationStyle == .style1{
-                    container.menuContainerTrailSpace.constant = SlideMenuOptions.screenFrame.width
-                    container.menuContainerLedSpace.constant   = -SlideMenuOptions.thresholdLedSpace
-                }else{
-                    container.mainContainerTrailSpace.constant = 0
-                    container.mainContainerLedSpace.constant = 0
-                    menuSlideAnimation(x: SlideMenuOptions.pending)
-                }
-                
-                UIView.animate(withDuration: 0.35, animations: { () -> Void in
-                    
-                    container.tableView.isUserInteractionEnabled = false
-                    self.transparentView.isEnabled = false
-                    self.transparentView.alpha = 0
-                    container.view.layoutIfNeeded()
-               
-                }, completion: { (finished) -> Void in
-                    self.transparentView.isHidden = true
-                    self.transparentView.isEnabled = true
-                    container.tableView.isUserInteractionEnabled = true
-                })
+                container.panMenuClose()
             }
         }
     }
@@ -304,12 +260,12 @@ extension SlideMenuContainerVC {
                 container.mainContainerLedSpace.constant = 0
             }
             
-            UIView.animate(withDuration: 0.35, animations: { () -> Void in
+            UIView.animate(withDuration: SlideMenuOptions.panAnimationDuration, animations: { () -> Void in
                 container.tableView.isUserInteractionEnabled = false
                 self.transparentView.isEnabled = false
                 self.transparentView.alpha = 0
                 container.view.layoutIfNeeded()
-
+                
             }, completion: { (finished) -> Void in
                 self.transparentView.isHidden = true
                 self.transparentView.isEnabled = true
@@ -324,12 +280,12 @@ extension SlideMenuContainerVC {
     }
     
     //MARK: - Swipe Getsure code
-
+    
     func swipePanAction(gestureRecognizer: UIScreenEdgePanGestureRecognizer) {
         if !SlideMenuOptions.panGesturesEnabled{
             return
         }
-
+        
         if let navCon: UINavigationController = self.tabbar!.selectedViewController as? UINavigationController{
             if navCon.viewControllers.count != 1 {
                 return
@@ -350,10 +306,15 @@ extension SlideMenuContainerVC {
             
         case .ended,.failed,.cancelled:
             let translation: CGPoint = gestureRecognizer.translation(in: self.view)
+            let vel: CGPoint = gestureRecognizer.velocity(in: self.view)
             let halfWidth = SlideMenuOptions.screenFrame.width / 2
             self.view.endEditing(true)
             //  recognizer has received touches recognized as the end of the gesture base on menu close/open
-            if  translation.x > halfWidth{
+            if vel.x > SlideMenuOptions.panVelocity{
+                self.panMenuOpen()
+            }else if vel.x < -SlideMenuOptions.panVelocity{
+                self.panMenuClose()
+            }else if  translation.x > halfWidth{
                 self.panMenuOpen()
             }else{
                 self.panMenuClose()
@@ -365,7 +326,7 @@ extension SlideMenuContainerVC {
         }
     }
     //  MenuContainer/MainContainer Constraint update base on moment action
-
+    
     func moveContainerOnGesture(x:CGFloat,translation: CGPoint){
         let ctPoint = (x + translation.x)
         
@@ -420,13 +381,13 @@ extension SlideMenuContainerVC {
         }else{
             mainContainerTrailSpace.constant = 0
             mainContainerLedSpace.constant = 0
-            menuSlideAnimation(x: SlideMenuOptions.pending)
+            menuSlideAnimation(x: SlideMenuOptions.pending,isAnimate: false)
         }
         
-        UIView.animate(withDuration: 0.1, animations: { () -> Void in
+        UIView.animate(withDuration: SlideMenuOptions.panAnimationDuration, animations: { () -> Void in
             self.transparentView.isEnabled = false
             self.tableView.isUserInteractionEnabled = false
-
+            
             self.transparentView.alpha = 0
             self.view.layoutIfNeeded()
             
@@ -437,31 +398,31 @@ extension SlideMenuContainerVC {
         })
     }
     //  recognizer has received touches recognized as the end of the gesture base on menu open method
-
+    
     func panMenuOpen() {
         menuActionType = .open
         
         if SlideMenuOptions.animationStyle == .style1{
             menuContainerTrailSpace.constant = SlideMenuOptions.pending
             menuContainerLedSpace.constant = 0
-
+            
         }else{
             mainContainerTrailSpace.constant = -SlideMenuOptions.thresholdLedSpace
             mainContainerLedSpace.constant = SlideMenuOptions.thresholdLedSpace
-            menuSlideAnimation(x: SlideMenuOptions.screenFrame.width)
+            menuSlideAnimation(x: SlideMenuOptions.screenFrame.width,isAnimate: false)
         }
         self.transparentView.isHidden = false
         
-        UIView.animate(withDuration: 0.1, animations: { () -> Void in
+        UIView.animate(withDuration: SlideMenuOptions.panAnimationDuration, animations: { () -> Void in
             self.transparentView.isEnabled = false
             self.tableView.isUserInteractionEnabled = false
-
+            
             self.transparentView.alpha = 1
             self.view.layoutIfNeeded()
             
         }, completion: { (finished) -> Void in
             self.tableView.isUserInteractionEnabled = true
-
+            
             self.transparentView.isEnabled = true
         })
     }
@@ -469,17 +430,20 @@ extension SlideMenuContainerVC {
     //MARK: -  animation method
     //  Menu slide animation with user touch moment code
     
-    func menuSlideAnimation(x: CGFloat){
+    func menuSlideAnimation(x: CGFloat,isAnimate:Bool = true){
         let progress: CGFloat = (x)/SlideMenuOptions.thresholdLedSpace
         let slideMovement : CGFloat = 100
         var location :CGFloat = (slideMovement * -1) + (slideMovement * progress)
         location = location > 0 ? 0 : location
         self.menuContainerLedSpace.constant = location
-        self.menuContainerTrailSpace.constant =  abs(location)
-        UIView.animate(withDuration: 0.1) {
-            self.view.layoutIfNeeded()
+        self.menuContainerTrailSpace.constant =  abs(location) + SlideMenuOptions.pending
+        if isAnimate{
+            UIView.animate(withDuration: 0.1) {
+                self.view.layoutIfNeeded()
+            }
         }
-      
+        
+        
     }
     
     //  Transparent view alpha animation with user touch moment code
@@ -491,6 +455,7 @@ extension SlideMenuContainerVC {
             self.transparentView.alpha = progress
         }
     }
+
 }
 
 //MARK: - Slider Menu UI
@@ -510,7 +475,8 @@ extension SlideMenuContainerVC {
         transparentView.alpha = 0
         transparentView.isHidden = true
         transparentView.addTarget(self, action: #selector(ParentVC.shutterAction(_:)), for: UIControlEvents.touchUpInside)
-
+        
+        
         if SlideMenuOptions.animationStyle == .style1{
             transparentView.frame =  CGRect(x: 0, y: 0, width: SlideMenuOptions.screenFrame.width, height: SlideMenuOptions.screenFrame.height)
             transparentView.backgroundColor = UIColor.black.withAlphaComponent(0.7)
@@ -519,7 +485,7 @@ extension SlideMenuContainerVC {
         }else{
             transparentView.frame =  CGRect(x: SlideMenuOptions.thresholdLedSpace, y: 0, width: SlideMenuOptions.pending, height: SlideMenuOptions.screenFrame.height)
             transparentView.backgroundColor =   UIColor.clear
-
+            
             self.view.addSubview(self.transparentView)
         }
     }
